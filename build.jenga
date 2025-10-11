@@ -1,0 +1,3 @@
+
+main: main.zig mandelbrot.b
+  zig build-exe main.zig -O ReleaseFast
