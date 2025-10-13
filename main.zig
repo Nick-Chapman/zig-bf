@@ -8,6 +8,7 @@ var stdin_reader = std.fs.File.stdin().reader(&stdin_buffer);
 const stdin = &stdin_reader.interface;
 
 pub fn main() void {
+    precalculate_jumps();
     var mem = [_]u8{0} ** 30_000;
     var ip: usize = 0;
     var mp: usize = 0;
@@ -23,8 +24,10 @@ pub fn main() void {
             '-' => mem[mp] -%= 1,
             '>' => mp += 1,
             '<' => mp -= 1,
-            '[' => if (mem[mp] == 0) { ip = skip_right(ip+1); },
-            ']' => if (mem[mp] != 0) { ip = skip_left(ip-1); },
+            //'[' => if (mem[mp] == 0) { ip = skip_right(ip+1); },
+            //']' => if (mem[mp] != 0) { ip = skip_left(ip-1); },
+            '[' => if (mem[mp] == 0) { ip = jumps[ip]; },
+            ']' => if (mem[mp] != 0) { ip = jumps[ip]; },
             else => {},
         }
         ip += 1;
@@ -32,30 +35,50 @@ pub fn main() void {
     print("final #steps:{d}\n",.{step});
 }
 
-fn skip_right(ip0: usize) usize {
-    var ip = ip0;
-    var nest : usize = 0;
-    var c = prog[ip];
-    while (nest>0 or c != ']') {
-        if (ip > prog.len) break;
-        if (c == '[') nest += 1;
-        if (c == ']') nest -= 1;
-        ip += 1;
-        c = prog[ip];
+var jumps : [prog.len]usize = undefined;
+
+fn precalculate_jumps() void {
+    var last : usize = 0;
+    for (0..prog.len) |i| {
+        switch(prog[i]) {
+            '[' => { jumps[i] = last; last = i; },
+            ']' => {
+                const saved_last = jumps[last];
+                jumps[i] = last;
+                jumps[last] = i;
+                last = saved_last;
+            },
+            else => {
+                jumps[i] = 0;
+            }
+        }
     }
-    return ip;
 }
 
-fn skip_left(ip0: usize) usize {
-    var ip = ip0;
-    var nest : usize = 0;
-    var c = prog[ip];
-    while (nest>0 or c != '[') {
-        if (ip > prog.len) break;
-        if (c == ']') nest += 1;
-        if (c == '[') nest -= 1;
-        ip -= 1;
-        c = prog[ip];
-    }
-    return ip;
-}
+// fn skip_right(ip0: usize) usize {
+//     var ip = ip0;
+//     var nest : usize = 0;
+//     var c = prog[ip];
+//     while (nest>0 or c != ']') {
+//         if (ip > prog.len) break;
+//         if (c == '[') nest += 1;
+//         if (c == ']') nest -= 1;
+//         ip += 1;
+//         c = prog[ip];
+//     }
+//     return ip;
+// }
+
+// fn skip_left(ip0: usize) usize {
+//     var ip = ip0;
+//     var nest : usize = 0;
+//     var c = prog[ip];
+//     while (nest>0 or c != '[') {
+//         if (ip > prog.len) break;
+//         if (c == ']') nest += 1;
+//         if (c == '[') nest -= 1;
+//         ip -= 1;
+//         c = prog[ip];
+//     }
+//     return ip;
+// }
