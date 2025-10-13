@@ -3,7 +3,11 @@ const debug = std.debug;
 const print = debug.print;
 const prog = @embedFile("mandelbrot.b");
 
-pub fn main() !void {
+var stdin_buffer: [1024]u8 = undefined;
+var stdin_reader = std.fs.File.stdin().reader(&stdin_buffer);
+const stdin = &stdin_reader.interface;
+
+pub fn main() void {
     var mem = [_]u8{0} ** 30_000;
     var ip: usize = 0;
     var mp: usize = 0;
@@ -13,7 +17,7 @@ pub fn main() !void {
         const op: u8 = prog[ip];
         //print("step:{d}, ip={d}, mp={d}, op='{c}'\n",.{step,ip,mp,op});
         switch(op) {
-            ',' => @panic("input"),
+            ',' => mem[mp] = stdin.takeByte() catch 0,
             '.' => print("{c}",.{mem[mp]}),
             '+' => mem[mp] +%= 1,
             '-' => mem[mp] -%= 1,
