@@ -1,3 +1,9 @@
 
-main: main.zig mandelbrot.b
-  zig build-exe main.zig -O ReleaseFast
+version:
+  echo 0.15.1 > version
+
+zig_installed_location: version
+  echo ~/zig/zig-x86_64-linux-$(cat version) > zig_installed_location
+
+main: zig_installed_location main.zig mandelbrot.b
+  $(cat zig_installed_location)/zig build-exe main.zig -O ReleaseFast
