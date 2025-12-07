@@ -3,7 +3,7 @@ version:
   echo 0.15.1 > $@
 
 zig_installed_location: version
-  echo ~/zig/zig-x86_64-linux-$(cat $<) > $@
+  echo ~/zig/zig-x86_64-linux-$$(cat $<) > $@
 
 main: zig_installed_location main.zig mandelbrot.b
-  $(cat zig_installed_location)/zig build-exe main.zig -O ReleaseFast
+  $$(cat zig_installed_location)/zig build-exe main.zig -O ReleaseFast
